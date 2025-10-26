@@ -140,7 +140,7 @@ cat lab02.md
 
 ---
 title: "Лабораторная работа №2"
-author: "Самира Хабиба Осман"
+author: "Сархан Хабиба Осама"
 date: "5 октября 2025 г."
 mainfont: "DejaVu Serif"
 lang: ru
