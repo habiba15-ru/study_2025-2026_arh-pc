@@ -1,0 +1,549 @@
+mainfont: DejaVu Serif sansfont: DejaVu Sans monofont: DejaVu Sans Mono
+lang: ru --- title: ``лабораторная работа №7'' author: ``Сархан хабиба
+осама'' date: ``22 ноября 2025'' ---
+
+\hypertarget{ux446ux435ux43bux44c-ux440ux430ux431ux43eux442ux44b}{%
+\section{Цель
+работы}\label{ux446ux435ux43bux44c-ux440ux430ux431ux43eux442ux44b}}
+
+Освоение арифметических инструкций языка ассемблера NASM. Изучение
+команд условного и безусловного переходов. Приобретение навыков
+написания программ с использованием переходов. Знакомство с назначением
+и структурой файла листинга.
+
+\hypertarget{ux445ux43eux434-ux440ux430ux431ux43eux442ux44b}{%
+\section{Ход
+работы}\label{ux445ux43eux434-ux440ux430ux431ux43eux442ux44b}}
+
+\hypertarget{ux441ux43eux437ux434ux430ux43dux438ux435-ux43aux430ux442ux430ux43bux43eux433ux430-ux434ux43bux44f-ux43bux430ux431ux43eux440ux430ux442ux43eux440ux43dux43eux439-ux440ux430ux431ux43eux442ux44b}{%
+\subsection{1. Создание каталога для лабораторной
+работы}\label{ux441ux43eux437ux434ux430ux43dux438ux435-ux43aux430ux442ux430ux43bux43eux433ux430-ux434ux43bux44f-ux43bux430ux431ux43eux440ux430ux442ux43eux440ux43dux43eux439-ux440ux430ux431ux43eux442ux44b}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{mkdir}\NormalTok{ \textasciitilde{}/work/arch{-}pc/lab07}
+\BuiltInTok{cd}\NormalTok{ \textasciitilde{}/work/arch{-}pc/lab07}
+\FunctionTok{touch}\NormalTok{ lab7{-}1.asm}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{./1.png}
+\caption{Результат lab7}
+\end{figure}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{1}
+\tightlist
+\item
+  Создание и выполнение программы lab7-1.asm Создан файл lab7-1.asm с
+  программой безусловных переходов:
+\end{enumerate}
+
+\begin{verbatim}
+%include 'in_out.asm'
+
+SECTION .data
+msg1: DB 'Сообщение № 1',0
+msg2: DB 'Сообщение № 2',0
+msg3: DB 'Сообщение № 3',0
+
+SECTION .text
+GLOBAL _start
+_start:
+    jmp _label2
+_label1:
+    mov eax, msg1
+    call sprintLF
+    jmp _end
+_label2:
+    mov eax, msg2
+    call sprintLF
+    jmp _label1
+_label3:
+    mov eax, msg3
+    call sprintLF
+_end:
+    call quit
+\end{verbatim}
+
+Компиляция и выполнение:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+
+\FunctionTok{nasm} \AttributeTok{{-}f}\NormalTok{ elf lab7{-}1.asm}
+\FunctionTok{ld} \AttributeTok{{-}m}\NormalTok{ elf\_i386 }\AttributeTok{{-}o}\NormalTok{ lab7{-}1 lab7{-}1.o}
+\ExtensionTok{./lab7{-}1}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{./2.png} Результат: Сообщение № 2 Сообщение № 3
+;\ldots\ldots\ldots\ldots\ldots\ldots\ldots.
+
+2\_2. Изменение программы для вывода: Сообщение № 3, Сообщение № 2,
+Сообщение № 1
+
+\begin{verbatim}
+_start:
+    jmp _label3
+_label1:
+    mov eax, msg1
+    call sprintLF
+    jmp _end
+_label2:
+    mov eax, msg2
+    call sprintLF
+    jmp _label1
+_label3:
+    mov eax, msg3
+    call sprintLF
+    jmp _label2
+_end:
+    call quit
+\end{verbatim}
+
+Результат выполнения:
+
+Сообщение № 3 Сообщение № 2 Сообщение № 1
+
+\includegraphics{./3.png}
+;\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots.
+3. Создание и выполнение программы lab7-2.asm Код программы:
+
+\begin{verbatim}
+%include 'in_out.asm'
+
+section .data
+msg1 db 'Введите B: ',0h
+msg2 db "Наибольшее число: ",0h
+A dd 20
+C dd 50
+
+section .bss
+max resb 10
+B resb 10
+
+section .text
+global _start
+_start:
+    mov eax, msg1
+    call sprint
+    mov ecx, B
+    mov edx, 10
+    call sread
+    mov eax, B
+    call atoi
+    mov [B], eax
+    mov ecx, [A]
+    mov [max], ecx
+    cmp ecx, [C]
+    jg check_B
+    mov ecx, [C]
+    mov [max], ecx
+check_B:
+    mov eax, max
+    call atoi
+    mov [max], eax
+    mov ecx, [max]
+    cmp ecx, [B]
+    jg fin
+    mov ecx, [B]
+    mov [max], ecx
+fin:
+    mov eax, msg2
+    call sprint
+    mov eax, [max]
+    call iprintLF
+    call quit
+\end{verbatim}
+
+Тестирование программы:
+
+\begin{itemize}
+\tightlist
+\item
+  При B=30 → Результат: 50
+\item
+  При B=60 → Результат: 60
+\item
+  При B=10 → Результат: 50
+\end{itemize}
+
+\includegraphics{./4.png}
+;\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots{}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Работа с файлом листинга Создание файла листинга:
+\end{enumerate}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{nasm} \AttributeTok{{-}f}\NormalTok{ elf }\AttributeTok{{-}l}\NormalTok{ lab7{-}2.lst lab7{-}2.asm}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{figure}
+\centering
+\includegraphics{./5.png}
+\caption{Результат lab7}
+\end{figure}
+
+Анализ трех строк листинга: Строка 8:
+
+\begin{figure}
+\centering
+\includegraphics{./6.png}
+\caption{Результат lab7}
+\end{figure}
+
+8 00000000 B800000000 mov eax, msg1
+
+\begin{verbatim}
+Адрес: 00000000
+
+Машинный код: B800000000
+
+Инструкция: загрузка адреса msg1 в регистр eax
+\end{verbatim}
+
+Строка 9: text
+
+9 00000005 E8{[}00000000{]} call sprint
+
+\begin{verbatim}
+Адрес: 00000005
+\end{verbatim}
+
+Машинный код: E8{[}00000000{]}
+
+\begin{verbatim}
+Инструкция: вызов подпрограммы sprint
+\end{verbatim}
+
+Строка 10: text
+
+10 0000000A B900000000 mov ecx, B
+
+\begin{verbatim}
+Адрес: 0000000A
+
+Машинный код: B900000000
+
+Инструкция: загрузка адреса B в регистр ecx
+\end{verbatim}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{6}
+\item
+  Анализ дополнительных строк листинга Строка 8: cmp byte {[}eax{]}, 0
+
+  Адрес в памяти: определяется во время выполнения
+
+  Машинный код: зависит от адреса
+
+  Инструкция: сравнение байта по адресу в eax с нулем
+
+  Назначение: проверка достижения конца строки (нулевой байт)
+\end{enumerate}
+
+Строка 9: jz finished
+
+\begin{verbatim}
+Адрес в памяти: следующий за cmp
+
+Машинный код: 74 [смещение]
+
+Инструкция: переход если равно нулю (Zero Flag = 1)
+
+Назначение: если текущий символ = 0, переход на метку finished
+\end{verbatim}
+
+Строка 10: inc eax
+
+\begin{verbatim}
+Адрес в памяти: следующий за jz
+
+Машинный код: 40
+
+Инструкция: увеличение значения в eax на 1
+
+Назначение: переход к следующему байту в строке
+\end{verbatim}
+
+Строка 11: jmp nextchar
+
+\begin{verbatim}
+Адрес в памяти: следующий за inc
+
+Машинный код: EB [смещение]
+
+Инструкция: безусловный переход
+
+Назначение: возврат к началу цикла для проверки следующего символа
+\end{verbatim}
+
+Изменения в коде:
+
+\begin{verbatim}
+; Было (правильно):
+mov eax, msg1
+
+; Стало (ошибка):
+mov eax     ; Удален второй операнд msg1
+\end{verbatim}
+
+Попытка компиляции с ошибкой:
+
+\begin{verbatim}
+nasm -f elf -l lab7-2-error.lst lab7-2.asm
+\end{verbatim}
+
+Результат компиляции с ошибкой:
+
+\begin{verbatim}
+lab7-2.asm:15: error: parser: instruction expected
+\end{verbatim}
+
+\includegraphics{./7.png} \includegraphics{./8.png}
+\includegraphics{./9.png}
+
+Анализ результатов при ошибке:
+
+Какие файлы создаются:
+
+\begin{verbatim}
+ lab7-2.o - не создается
+
+ lab7-2-error.lst - не создается
+
+ Только сообщения об ошибках на экране
+\end{verbatim}
+
+Что добавляется в листинг:
+
+\begin{verbatim}
+При наличии ошибок файл листинга не создается вообще
+
+Транслятор выводит ошибки только на экран
+\end{verbatim}
+
+;\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots{}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{3}
+\tightlist
+\item
+  Создание и выполнение программы lab7-3.asm
+\end{enumerate}
+
+Код программы:
+
+\begin{verbatim}
+%include 'in_out.asm'
+
+section .data
+msg1 db 'Введите B: ',0h
+msg2 db "Наименьшее число: ",0h
+A dd 17
+C dd 23
+
+section .bss
+min resb 10
+B resb 10
+
+section .text
+global _start
+_start:
+    mov eax, msg1
+    call sprint
+    mov ecx, B
+    mov edx, 10
+    call sread
+    mov eax, B
+    call atoi
+    mov [B], eax
+    mov ecx, [A]
+    mov [min], ecx
+    cmp ecx, [C]
+    jl check_B
+    mov ecx, [C]
+    mov [min], ecx
+check_B:
+    mov eax, min
+    call atoi
+    mov [min], eax
+    mov ecx, [min]
+    cmp ecx, [B]
+    jl fin
+    mov ecx, [B]
+    mov [min], ecx
+fin:
+    mov eax, msg2
+    call sprint
+    mov eax, [min]
+    call iprintLF
+    call quit
+\end{verbatim}
+
+Тестирование программы:
+
+\begin{itemize}
+\tightlist
+\item
+  При B=30 → Результат: 50
+\item
+  При B=60 → Результат: 60
+\item
+  При B=10 → Результат: 50
+\end{itemize}
+
+\includegraphics{./10.png}
+;\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots\ldots.
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\setcounter{enumi}{4}
+\tightlist
+\item
+  Создание и выполнение программы lab7-4.asm
+\end{enumerate}
+
+Код программы:
+
+\begin{verbatim}
+%include 'in_out.asm'
+
+section .data
+msg_x db 'Введите x: ',0h
+msg_a db 'Введите a: ',0h
+msg_result db "Результат f(x): ",0h
+
+section .bss
+x resb 10
+a resb 10
+result resb 4
+
+section .text
+global _start
+_start:
+    mov eax, msg_x
+    call sprint
+    mov ecx, x
+    mov edx, 10
+    call sread
+    mov esi, x
+    call remove_newline
+    mov eax, x
+    call atoi
+    mov [x], eax
+    mov eax, msg_a
+    call sprint
+    mov ecx, a
+    mov edx, 10
+    call sread
+    mov esi, a
+    call remove_newline
+    mov eax, a
+    call atoi
+    mov [a], eax
+    mov eax, [x]
+    mov ebx, [a]
+    cmp eax, ebx
+    jl less_than
+    jmp greater_equal
+less_than:
+    mov eax, [a]
+    mov ebx, 2
+    mul ebx
+    sub eax, [x]
+    jmp print_result
+greater_equal:
+    mov eax, 8
+print_result:
+    mov [result], ea
+    mov eax, msg_result
+    call sprint
+    mov eax, [result]
+    call iprintLF
+    call quit
+remove_newline:
+    mov edi, esi
+.next_char:
+    mov al, [edi]
+    inc edi
+    cmp al, 0
+    je .done
+    cmp al, 10
+    jne .next_char
+    dec edi
+    mov byte [edi], 0
+.done:
+    ret
+\end{verbatim}
+
+Тестирование программы:
+
+\begin{itemize}
+\tightlist
+\item
+  При x=1, a=2 → Результат: 3
+\item
+  При x=2, a=1 → Результат: 8
+\end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics{./11.png}
+\caption{Результат lab7}
+\end{figure}
+
+Функция:
+
+f(x) = \{ 2a - x, если x \textless{} a \{ 8, если x ≥ a Тестирование с
+значениями из таблицы:
+
+\begin{verbatim}
+При x=1, a=2 → Результат: 3 (2*2 - 1 = 3)
+
+При x=2, a=1 → Результат: 8 (x ≥ a)
+\end{verbatim}
+
+Логика программы:
+
+\begin{verbatim}
+Ввод значений x и a
+
+Сравнение x и a
+
+Если x < a: вычисление 2a - x
+
+Если x ≥ a: результат = 8
+
+Вывод результата
+\end{verbatim}
+
+\begin{figure}
+\centering
+\includegraphics{./11.png}
+\caption{Результат lab7}
+\end{figure}
+
+Выводы
+
+В ходе лабораторной работы были освоены: Команды безусловного перехода
+(jmp) Команды условного перехода (jg, jl, je, jz) Работа с файлами
+листинга NASM Написание программ с ветвлениями Преобразование данных
+между символьным и числовым форматами Анализ машинного кода и адресации
+в листинге Работа с языком ассемблера NASM позволяет лучше понять
+архитектуру компьютера и принципы работы процессора на низком уровне.
+Особенно важным было изучение циклов обработки строк и работы с флагами
+процессора.
